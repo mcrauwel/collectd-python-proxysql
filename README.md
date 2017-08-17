@@ -13,15 +13,17 @@ Currently this plugin collects only global stats, work needs to be done to also 
 
 If you don’t already have the Python module loaded, you need to configure it first:
 
+```
 <LoadPlugin python>
 	Globals true
 </LoadPlugin>
 <Plugin python>
 	ModulePath "/path/to/python/modules"
 </Plugin>
-
+```
 You should then configure the ProxySQL plugin:
 
+```
 <Plugin python>
   Import proxysql
   <Module proxysql>
@@ -32,3 +34,4 @@ You should then configure the ProxySQL plugin:
     Verbose true (optional, to enable debugging)
   </Module>
 </Plugin>
+```
