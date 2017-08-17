@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# CollectD ProxySQL plugin, designed for MySQL 5.5+ (specifically Percona Server)
+# CollectD ProxySQL plugin
 #
 # Configuration:
 #  Import proxysql
