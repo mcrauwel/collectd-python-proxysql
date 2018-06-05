@@ -24,6 +24,7 @@
 import collectd
 import re
 import MySQLdb
+import socket
 
 PROXYSQL_CONFIG = {
     'Host':           'localhost',
@@ -42,6 +43,16 @@ PROXYSQL_STATUS_VARS = {
     'ProxySQL_Uptime': 'counter',
     'Questions': 'counter',
     'Slow_queries': 'counter',
+    'ConnPool_memory_bytes': 'gauge',
+    'ConnPool_get_conn_immediate': 'counter',
+    'ConnPool_get_conn_success': 'counter',
+    'ConnPool_get_conn_failure': 'counter',
+    'Queries_backends_bytes_recv': 'counter',
+    'Queries_backends_bytes_sent': 'counter',
+    'Queries_frontends_bytes_recv': 'counter',
+    'Queries_frontends_bytes_sent': 'counter',
+    'Query_Processor_time_nsec': 'gauge',
+    'Backend_query_time_nsec': 'gauge'
 }
 
 PROXYSQL_CONNECTION_POOL_STATS = {
@@ -152,22 +163,28 @@ def read_callback():
 
         dispatch_value('status', key, proxysql_status[key], ds_type)
 
-    # proxysql_connection_pool_stats = fetch_proxysql_connection_pool_stats(conn)
-    # for hostgroup in proxysql_connection_pool_stats:
-    #     hostgroup_connection_pool_stats = proxysql_connection_pool_stats[hostgroup]
-    #
-    #     for server_key in hostgroup_connection_pool_stats:
-    #         server_connection_pool_stats = hostgroup_connection_pool_stats[server_key]
-    #
-    #         for key in server_connection_pool_stats:
-    #
-    #             if key in PROXYSQL_CONNECTION_POOL_STATS:
-    #                 ds_type = PROXYSQL_CONNECTION_POOL_STATS[key]
-    #             else:
-    #                 continue
-    #
-    #             plugin_key = hostgroup + '-' + server_key + '-proxysql'
-    #             dispatch_value('connection_pool_stats', key, server_connection_pool_stats[key], ds_type, None, plugin_key)
+    proxysql_connection_pool_stats = fetch_proxysql_connection_pool_stats(conn)
+    for hostgroup in proxysql_connection_pool_stats:
+        hostgroup_connection_pool_stats = proxysql_connection_pool_stats[hostgroup]
+
+        for server_key in hostgroup_connection_pool_stats:
+            server_connection_pool_stats = hostgroup_connection_pool_stats[server_key]
+
+            for key in server_connection_pool_stats:
+
+                if key in PROXYSQL_CONNECTION_POOL_STATS:
+                    ds_type = PROXYSQL_CONNECTION_POOL_STATS[key]
+                else:
+                    continue
+
+                server_addr = server_key.split(':')[0]
+                try:
+                    server_name = socket.gethostbyaddr(server_addr)[0].split('.')[0]
+                except socket.herror:
+                    server_name = server_addr.replace('.', '-')
+
+                plugin_key = 'proxysql.hostgroup-' + hostgroup + '.' + server_name
+                dispatch_value('connection_pool_stats', key, server_connection_pool_stats[key], ds_type, None, plugin_key)
 
 collectd.register_read(read_callback)
 collectd.register_config(configure_callback)
