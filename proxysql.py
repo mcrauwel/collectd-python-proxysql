@@ -8,7 +8,8 @@
 #      Port 6032 (optional)
 #      User admin
 #      Password xxxx
-#   Verbose true (optional, to enable debugging)
+#      Hostgroup_metrics true (optinal, to collect stats about hostgroup backends)
+#      Verbose true (optional, to enable debugging)
 #  </Module>
 #
 # Requires "MySQLdb" for Python
@@ -31,6 +32,7 @@ PROXYSQL_CONFIG = {
     'Port':           6032,
     'User':           'admin',
     'Password':       '',
+    'Hostgroup_metrics': False,
     'Verbose':        False,
 }
 
@@ -146,6 +148,7 @@ def configure_callback(conf):
             PROXYSQL_CONFIG[node.key] = node.values[0]
 
     PROXYSQL_CONFIG['Port']    = int(PROXYSQL_CONFIG['Port'])
+    PROXYSQL_CONFIG['Hostgroup_metrics'] = bool(PROXYSQL_CONFIG['Hostgroup_metrics'])
     PROXYSQL_CONFIG['Verbose'] = bool(PROXYSQL_CONFIG['Verbose'])
 
 def read_callback():
@@ -162,6 +165,9 @@ def read_callback():
             continue
 
         dispatch_value('status', key, proxysql_status[key], ds_type)
+
+    if PROXYSQL_CONFIG['Hostgroup_metrics'] == False:
+        return
 
     proxysql_connection_pool_stats = fetch_proxysql_connection_pool_stats(conn)
     for hostgroup in proxysql_connection_pool_stats:
