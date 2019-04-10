@@ -5,9 +5,10 @@ Currently this plugin collects only global stats, work needs to be done to also 
 
 ## Installation
 
-1. Place proxysql.py in your CollectD python plugins directory
-2. Configure the plugin in CollectD
-3. Restart CollectD
+1. Install `MySQLdb` Python package (try `yum install MySQL-python` or `apt install python-mysqldb`)
+2. Place proxysql.py in your CollectD python plugins directory
+3. Configure the plugin in CollectD
+4. Restart CollectD
 
 ## Configuration
 
