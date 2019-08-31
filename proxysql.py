@@ -44,7 +44,7 @@ PROXYSQL_STATUS_VARS = {
     'Client_Connections_non_idle': 'gauge',
     'Server_Connections_aborted': 'counter',
     'Server_Connections_connected': 'gauge',
-    'Server_Connections_created': 'counter'
+    'Server_Connections_created': 'counter',
     'ProxySQL_Uptime': 'counter',
     'Questions': 'counter',
     'Slow_queries': 'counter',
